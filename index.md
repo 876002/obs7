@@ -1,4 +1,12 @@
-OBS7 Course Materials
-Complete lecture slides for OBS7: Observers for State Space Systems.
+# OBS7 Course Slides and Materials
 
-all_slides%20OBS7.pptx
+Official lecture slides and study resources for the **OBS7** Mechatronics course.
+
+## Lecture Slides
+- [All OBS7 Slides (PowerPoint)](https://876002.github.io/obs7/all_slides%20OBS7.pptx)
+- [All OBS7 Slides (PDF - Recommended)](https://876002.github.io/obs7/obs7-all-slides.pdf)
+
+## Covered Topics
+- Module overview and learning objectives
+- System modeling, control loops, and mechatronic integration
+- Practical assignments and assessment criteria
