@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://876002.github.io/obs7/sitemap.xml

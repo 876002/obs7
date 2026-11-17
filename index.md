@@ -1,18 +1,8 @@
-# OBS7 Course Slides, Homework Solutions, and Exams
+# OBS7 Control Engineering Course Materials
 
-Official lecture slides, homework assignment solutions, and past exams for the **OBS7** Mechatronics and Control Engineering course.
+Official lecture slides, homework assignments, solutions, and past exams for the OBS7 Mechatronics course.
 
-## Lecture Slides
-- [All OBS7 Lecture Slides (PowerPoint)](https://876002.github.io/obs7/all_slides%20OBS7.pptx)
-
-## Homework Solutions
-- [All Homework Assignments Solutions (PowerPoint)](https://876002.github.io/obs7/All%20Homework%20Assignments%20Solutions%20OBS7.pptx)
-
-## Past Exams
-- [December 2019 OBS7 Final Exam (PDF)](https://876002.github.io/obs7/2019Dec_OBS7_EXAM_ENfinal.pdf)
-- [December 2020 OBS7 Exam (PDF)](https://876002.github.io/obs7/2020Dec_OBS7_EXAM_EN.pdf)
-
-## Covered Topics
-- State-space control, observer design, and system dynamics
-- Homework exercises, worked solutions, and practical assignments
-- Past exam questions and assessment criteria
+- [OBS7 Lecture Slides](https://876002.github.io/obs7/slides.html)
+- [OBS7 Homework Assignments](https://876002.github.io/obs7/assignments.html)
+- [OBS7 Homework Assignments Solutions](https://876002.github.io/obs7/solutions.html)
+- [OBS7 Past Exams (2019 and 2020)](https://876002.github.io/obs7/exams.html)
