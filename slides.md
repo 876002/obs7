@@ -4604,3 +4604,110 @@ Te
 **Extracted Slide/Diagram Text:**
 ehmaeyanginthebiasfromoat
 
+## OBS7 Master Formula, MATLAB, and Homework Reference (Clean Index)
+
+### 1. Core State-Space & Transfer Function Equations (Lectures 1-2)
+* **State-space representation:**
+  $$\dot{x}(t) = Ax(t) + Bu(t)$$
+  $$y(t) = Cx(t) + Du(t)$$
+  where $x \in \mathbb{R}^n$ (state vector), $u \in \mathbb{R}^q$ (input), $y \in \mathbb{R}^r$ (output), $A \in \mathbb{R}^{n \times n}$, $B \in \mathbb{R}^{n \times q}$, $C \in \mathbb{R}^{r \times n}$, $D \in \mathbb{R}^{r \times q}$.
+* **Characteristic polynomial & eigenvalues (poles):**
+  $$\alpha(s) = \det(sI - A) = s^n + a_1 s^{n-1} + \dots + a_{n-1}s + a_n = 0$$
+  System is asymptotically stable (Hurwitz) if and only if all eigenvalues $\lambda_i$ of $A$ have strictly negative real parts ($\text{Re}(\lambda_i) < 0$).
+* **Transfer function from state-space:**
+  $$G(s) = \frac{Y(s)}{U(s)} = C(sI - A)^{-1}B + D$$
+* **Steady-state value for a unit step input ($u(t) = 1$, $\dot{x}_{ss} = 0$):**
+  $$0 = Ax_{ss} + B(1) \implies x_{ss} = -A^{-1}B, \quad y_{ss} = -CA^{-1}B + D$$
+* **Key MATLAB commands (Lectures 1-6):**
+  `sys = ss(A,B,C,D)`, `[num,den] = ss2tf(A,B,C,D)`, `[A,B,C,D] = tf2ss(num,den)`, `eig(A)`, `[V,D] = eig(A)`, `charpoly(A)`, `det(A)`, `inv(A)`, `rank(A)`, `ctrb(A,B)`, `obsv(A,C)`, `sysm = minreal(sys)`, `canon(sys, 'companion')`, ` canon(sys, 'modal')`, `ss2ss(sys, T)`.
+
+### 2. Full-State Feedback & Reference Tracking (Lectures 3-4)
+* **Control law (regulator, $r = 0$):** $u = -Kx = -[k_1 \quad k_2 \quad \dots \quad k_n]x$
+* **Closed-loop state matrix & characteristic equation:**
+  $$\dot{x} = (A - BK)x, \quad \alpha_c(s) = \det(sI - (A - BK)) = 0$$
+* **Ackermann's Formula for state feedback gain $K$:**
+  $$K = \begin{bmatrix} 0 & 0 & \dots & 0 & 1 \end{bmatrix} \mathcal{C}^{-1} \alpha_c(A)$$
+  where $\mathcal{C} = \begin{bmatrix} B & AB & A^2B & \dots & A^{n-1}B \end{bmatrix}$ is the controllability matrix and $\alpha_c(A) = A^n + \alpha_1 A^{n-1} + \dots + \alpha_n I$ is the desired characteristic polynomial evaluated at $A$.
+  MATLAB: `K = acker(A,B,desired_poles)` or `K = place(A,B,desired_poles)`.
+* **Reference input scaling ($\bar{N}$ or $N_x, N_u$) for zero steady-state tracking error:**
+  * Method 1 (Scalar feedforward gain $\bar{N}$): $u = \bar{N}r - Kx$, where
+    $$\bar{N} = -\left( C(A - BK)^{-1}B \right)^{-1}$$
+  * Method 2 (State and control reference gains $N_x, N_u$): $u = N_u r - K(x - N_x r) = -Kx + \bar{N}r$ with $\bar{N} = N_u + KN_x$, found by solving:
+    $$\begin{bmatrix} A & B \\ C & D \end{bmatrix} \begin{bmatrix} N_x \\ N_u \end{bmatrix} = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$$
+
+### 3. Controllability, Observability & Canonical Forms (Lectures 5-6)
+* **Controllability Matrix:** $\mathcal{C} = \begin{bmatrix} B & AB & A^2B & \dots & A^{n-1}B \end{bmatrix}$. Controllable iff $\text{rank}(\mathcal{C}) = n$ (or $\det(\mathcal{C}) \neq 0$ for SISO).
+* **Observability Matrix:** $\mathcal{O} = \begin{bmatrix} C \\ CA \\ CA^2 \\ \vdots \\ CA^{n-1} \end{bmatrix}$. Observable iff $\text{rank}(\mathcal{O}) = n$.
+* **Uncontrollable / Unobservable modes:** Correspond to pole-zero cancellations in $G(s)$. A realization that is both controllable and observable is a **minimal realization** (`minreal`).
+* **Control Canonical Form** for $G(s) = \frac{b_1 s^{n-1} + \dots + b_n}{s^n + a_1 s^{n-1} + \dots + a_n}$:
+  $$A_c = \begin{bmatrix} -a_1 & -a_2 & \dots & -a_n \\ 1 & 0 & \dots & 0 \\ 0 & 1 & \dots & 0 \\ \vdots & & \ddots & \vdots \end{bmatrix}, \quad B_c = \begin{bmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{bmatrix}, \quad C_c = \begin{bmatrix} b_1 & b_2 & \dots & b_n \end{bmatrix}, \quad D_c = 0$$
+* **Observer Canonical Form:**
+  $$A_o = \begin{bmatrix} -a_1 & 1 & 0 & \dots & 0 \\ -a_2 & 0 & 1 & \dots & 0 \\ \vdots & & & \ddots & \vdots \\ -a_n & 0 & 0 & \dots & 0 \end{bmatrix}, \quad B_o = \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_n \end{bmatrix}, \quad C_o = \begin{bmatrix} 1 & 0 & \dots & 0 \end{bmatrix}, \quad D_o = 0$$
+* **Similarity Transformation ($z = Tx$):** $\bar{A} = TAT^{-1}$, $\bar{B} = TB$, $\bar{C} = CT^{-1}$, $\bar{D} = D$ (or with $x = Tz$: $\bar{A} = T^{-1}AT, \bar{B} = T^{-1}B, \bar{C} = CT$). Eigenvalues and transfer function are invariant under similarity transformations.
+
+### 4. Luenberger Observer & Separation Principle (Lectures 7-9)
+* **Open-loop estimator:** $\dot{\hat{x}} = A\hat{x} + Bu$. State error $\tilde{x} = x - \hat{x}$ obeys $\dot{\tilde{x}} = A\tilde{x}$ (converges slowly or diverges if $A$ is unstable).
+* **Closed-loop Luenberger observer:**
+  $$\dot{\hat{x}} = A\hat{x} + Bu + L(y - C\hat{x}) = (A - LC)\hat{x} + Bu + Ly$$
+* **Estimation error dynamics:**
+  $$\dot{\tilde{x}} = (A - LC)\tilde{x}, \quad \alpha_e(s) = \det(sI - (A - LC)) = 0$$
+* **Ackermann's Formula for estimator gain $L$:**
+  $$L = \alpha_e(A) \mathcal{O}^{-1} \begin{bmatrix} 0 \\ \vdots \\ 0 \\ 1 \end{bmatrix}$$
+  By duality: `L = acker(A', C', desired_observer_poles)'` or `L = place(A', C', desired_observer_poles)'`.
+* **Bandwidth trade-off:** Estimator poles are typically chosen 2 to 6 times faster than controller poles. High-bandwidth observers (large $L$) converge quickly but amplify sensor measurement noise $y$; low-bandwidth observers filter noise better but rely heavily on plant model accuracy.
+* **Combined Regulator + Observer (Separation Principle):**
+  Using $u = -K\hat{x}$, the combined state-error equations are:
+  $$\begin{bmatrix} \dot{x} \\ \dot{\tilde{x}} \end{bmatrix} = \begin{bmatrix} A - BK & BK \\ 0 & A - LC \end{bmatrix} \begin{bmatrix} x \\ \tilde{x} \end{bmatrix}$$
+  Characteristic equation splits cleanly: $\det(sI - A + BK)\det(sI - A + LC) = 0$.
+* **Compensator Transfer Function $D_c(s) = \frac{U(s)}{Y(s)}$:**
+  $$D_c(s) = -K(sI - A + BK + LC)^{-1}L$$
+
+### 5. Reference Input with Estimator & Disturbance Observer (Lectures 10-11)
+* **Type 1: Autonomous Estimator ($u$ and $y$ fed to estimator independently):**
+  $$\dot{\hat{x}} = (A - BK - LC)\hat{x} + Ly + B\bar{N}r, \quad u = -K\hat{x} + \bar{N}r \quad (M = B\bar{N})$$
+  Estimator error $\dot{\tilde{x}} = (A - LC)\tilde{x}$ is completely unaffected by a step in $r$.
+* **Type 2: Tracking-Error Estimator (only error $e = y - r$ is measured):**
+  $$\dot{\hat{x}} = (A - BK - LC)\hat{x} + L(y - r), \quad u = -K\hat{x} \quad (M = -L, N = 0)$$
+  In Simulink with state vector $[x; \hat{x}]$ and $A_{cl} = \begin{bmatrix} A & -BK \\ LC & A-BK-LC \end{bmatrix}$, $\bar{N} = -\left(\begin{bmatrix} C & 0 \end{bmatrix} A_{cl}^{-1} \begin{bmatrix} 0 \\ -L \end{bmatrix}\right)^{-1}$. Type 2 introduces a compensator zero that increases step overshoot.
+* **Disturbance (Augmented) Observer (Lecture 11):**
+  For constant input disturbance $d$ ($\dot{d} = 0$) where $\dot{x} = Ax + B(u + d)$:
+  Define augmented state $x_e = \begin{bmatrix} x \\ d \end{bmatrix}$, yielding augmented matrices:
+  $$A_e = \begin{bmatrix} A & B \\ 0 & 0 \end{bmatrix}, \quad B_e = \begin{bmatrix} B \\ 0 \end{bmatrix}, \quad C_e = \begin{bmatrix} C & 0 \end{bmatrix}, \quad D_e = 0$$
+  Design $K = \text{acker}(A, B, \text{poles}_K)$ for the plant states, and $L = \text{acker}(A_e^T, C_e^T, \text{poles}_L)^T$ for the $(n+1)$ augmented observer states. Cancel disturbance using $u = -K\hat{x} - \hat{d} + \bar{N}r$.
+
+### 6. Clean Matrices for OCR-Corrupted Homework Problems
+* **Slide 51 & 56 (Two-Cart Homework):**
+  $m_1 \ddot{x}_1 + c_1 \dot{x}_1 + k(x_1 - x_2) = F(t)$, $m_2 \ddot{x}_2 + c_2 \dot{x}_2 + k(x_2 - x_1) = 0$.
+  With state $x = [x_1, \dot{x}_1, x_2, \dot{x}_2]^T$:
+  $$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ -k/m_1 & -c_1/m_1 & k/m_1 & 0 \\ 0 & 0 & 0 & 1 \\ k/m_2 & 0 & -k/m_2 & -c_2/m_2 \end{bmatrix}, \quad B = \begin{bmatrix} 0 \\ 1/m_1 \\ 0 \\ 0 \end{bmatrix}$$
+* **Slide 52 & 58 (Problem 7.15):**
+  $A = \begin{bmatrix} -1 & -1 \\ 2 & -4 \end{bmatrix}, B = \begin{bmatrix} 1 \\ 3 \end{bmatrix}$. Step steady-state: $x_{ss} = -A^{-1}B = \begin{bmatrix} -1/6 \\ 5/6 \end{bmatrix}$.
+* **Slide 104, 107 & 183 (Problem 7.21):**
+  $A = \begin{bmatrix} 0 & 1 \\ 7 & -4 \end{bmatrix}, B = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, C = \begin{bmatrix} 1 & 3 \end{bmatrix}$.
+  Transfer function: $G(s) = \frac{7s + 27}{s^2 + 4s - 7}$.
+  With $u = -[K_1 \quad K_2]x$: $\alpha_c(s) = s^2 + (4 + K_1 + 2K_2)s + (6K_1 + 7K_2 - 7) = 0$.
+  With output feedback $u = -Ky$: $s^2 + (4 + 7K)s + (27K - 7) = 0$.
+* **Slide 104 & 108 (Problem 7.22):**
+  $A = \begin{bmatrix} 0 & 1 \\ -6 & -5 \end{bmatrix}, B = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$. Specifications $\zeta = 0.707, t_p \le 3.14\text{ s} \implies \omega_d = 1, \omega_n = \sqrt{2}$, desired polynomial $s^2 + 2s + 2 = 0 \implies K = [-4 \quad -3]$.
+* **Slide 130, 133 & 134 (Problem 7.31 - Inverted Pendulum on Cart):**
+  $\ddot{\theta} = \theta + u$, $\ddot{x} = -\beta\theta - u$ with state $x = [\theta, \dot{\theta}, x, \dot{x}]^T$ and $\beta = 0.5$:
+  $$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ -\beta & 0 & 0 & 0 \end{bmatrix}, \quad B = \begin{bmatrix} 0 \\ 1 \\ 0 \\ -1 \end{bmatrix}, \quad C = \begin{bmatrix} 0 & 0 & 1 & 0 \end{bmatrix}$$
+  For poles at $-1, -1, -1 \pm j$: $K = [16 \quad 12 \quad 4 \quad 8]$ (for $\beta = 0.5$), $N_x = [0, 0, 1, 0]^T, N_u = 0$.
+* **Slide 231 & 235-237 (Problem 7.35):**
+  $G(s) = \frac{9}{s^2 - 9} \implies A_o = \begin{bmatrix} 0 & 1 \\ 9 & 0 \end{bmatrix}, B_o = \begin{bmatrix} 0 \\ 9 \end{bmatrix}, C_o = \begin{bmatrix} 1 & 0 \end{bmatrix}$.
+  Controllable ($\det(\mathcal{C}) = -81 \neq 0$). For poles at $-3 \pm 3j$: $K = [2 \quad 2/3]$. For estimator poles at $-12 \pm 12j$: $L = [24 \quad 297]^T$.
+  With $G_1(s) = \frac{9(s+1)}{s^2-9}$, $B_o = [9 \quad 9]^T$; feedback gain $k_2 = 1/9$ makes the closed-loop system unobservable by placing a closed-loop pole at $s = -1$ that cancels the zero at $s = -1$.
+* **Slide 232 & 238-240 (Problem 7.45 - Satellite):**
+  $\ddot{x} - 2\omega\dot{y} - 3\omega^2 x = 0$, $\ddot{y} + 2\omega\dot{x} = u$, measurement $z = y$, state $[x, \dot{x}, y, \dot{y}]^T$:
+  $$A = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 3\omega^2 & 0 & 0 & 2\omega \\ 0 & 0 & 0 & 1 \\ 0 & -2\omega & 0 & 0 \end{bmatrix}, \quad B = \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix}, \quad C = \begin{bmatrix} 0 & 0 & 1 & 0 \end{bmatrix}$$
+  Gain for observer poles at $-2\omega, -3\omega, -3\omega \pm 3\omega j$: $L = [-44.5\omega, -57.5\omega^2, 11\omega, 53\omega^2]^T$.
+* **Slide 259 & 267-268 (Problem 7.49 - Helicopter):**
+  $$A = \begin{bmatrix} -0.4 & 0 & -0.01 \\ 1 & 0 & 0 \\ -1.4 & 9.8 & -0.02 \end{bmatrix}, \quad B = \begin{bmatrix} 6.3 \\ 0 \\ 9.8 \end{bmatrix}, \quad C = \begin{bmatrix} 0 & 0 & 1 \end{bmatrix}$$
+  Open-loop poles: $-0.6565, 0.1183 \pm j0.3678$. For poles at $-2, -1 \pm j$: $K = [-0.4706 \quad 1.0 \quad 0.0627]$.
+* **Slide 261 & 273-277 (Problem 7.55 - Ship Heading):**
+  $$A = \begin{bmatrix} -0.0895 & -0.286 & 0 \\ -0.0439 & -0.272 & 0 \\ 0 & 1 & 0 \end{bmatrix}, \quad B = \begin{bmatrix} 0.0145 \\ -0.0122 \\ 0 \end{bmatrix}, \quad C = \begin{bmatrix} 0 & 0 & 1 \end{bmatrix}$$
+  For poles at $-0.2, -0.2 \pm 0.2j$: $K = [0.276 \quad -19.22 \quad -9.26]$. For estimator poles at $-0.8, -0.8 \pm 0.8j$: $L = [-19.09 \quad -1.81 \quad 2.04]^T$.
+* **Slide 319 & 324-326 (Problem 7.61 - Pendulum with Sensor Bias):**
+  $\ddot{\theta} + 4\theta = T_c + T_d$, augmented state $x = [\theta, \dot{\theta}, w]^T$ where $w$ is input-equivalent bias ($b = w/4$):
+  $$A = \begin{bmatrix} 0 & 1 & 0 \\ -4 & 0 & 1 \\ 0 & 0 & 0 \end{bmatrix}, \quad B = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}, \quad C = \begin{bmatrix} 1 & 0 & 1/4 \end{bmatrix}$$
+  For observer poles at $-10, -10, -10$: $L = [30 \quad 296 \quad 1000]^T$. For controllable poles at $-2 \pm 2j$: $K = [4 \quad 4 \quad 0]$ (or $K = [4 \quad 4 \quad 1]$ to cancel $w$).
