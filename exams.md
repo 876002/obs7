@@ -294,8 +294,7 @@ The general terms and conditions of the Fontys Institute of Engineering apply to
 
 ### Page 2
 
-You can answer in Dutch as well 
-2
+![Exam Page 2](images/2020Dec_OBS7_EXAM_EN_p2.png)
 
 ### Page 3
 
